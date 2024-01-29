@@ -5,3 +5,7 @@ select data from data files (JSON) to put in create table.py
 
 # run docker
 docker run -p 8080:80 nginx (run web server nginx) by mapping port 8080 to 80 
+docker compose up > to run something in docker (postgres)
+add one more new terminal *dont close terminal with postgres
+run python file with > python filename
+config or add more code in python file (etl & create table)
