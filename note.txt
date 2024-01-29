@@ -1,0 +1,4 @@
+Create data modeling
+run create table.py
+run etl.py
+select data from data files (JSON) to put in create table.py
