@@ -6,10 +6,10 @@ import psycopg2
 PostgresCursor = NewType("PostgresCursor", psycopg2.extensions.cursor)
 PostgresConn = NewType("PostgresConn", psycopg2.extensions.connection)
 
-table_drop_events = "DROP TABLE IF EXISTS events"
-table_drop_actors = "DROP TABLE IF EXISTS actors"
-table_drop_repositories = "DROP TABLE IF EXISTS repositories"
-table_drop_payload = "DROP TABLE IF EXISTS payload"
+table_drop_events = "DROP TABLE IF EXISTS events CASCADE"
+table_drop_actors = "DROP TABLE IF EXISTS actors CASCADE"
+table_drop_repositories = "DROP TABLE IF EXISTS repositories CASCADE"
+table_drop_payload = "DROP TABLE IF EXISTS payload CASCADE"
 
 table_create_actors = """
     CREATE TABLE IF NOT EXISTS actors (
@@ -29,30 +29,18 @@ table_create_events = """
 """
 table_create_repositories = """
     CREATE TABLE IF NOT EXISTS repositories (
-        repo_id int,
+        id text,
         name text,
         actor_id int,
-        create_at timestamp,
+        created_at timestamp,
         PRIMARY KEY(id),
         CONSTRAINT fk_actor FOREIGN KEY(actor_id) REFERENCES actors(id)
-    )
-"""
-table_create_payload = """
-    CREATE TABLE IF NOT EXISTS payload (
-        id text,
-        issue text,
-        url text,
-        action text,
-        repo_id int
-        PRIMARY KEY(id),
-        CONSTRAINT fk_repositaries FOREIGN KEY(repo_id) REFERENCES repositaries(id)
     )
 """
 create_table_queries = [
     table_create_actors,
     table_create_events,
     table_create_repositories,
-    table_create_payload,
 ]
 drop_table_queries = [
     table_drop_events,
