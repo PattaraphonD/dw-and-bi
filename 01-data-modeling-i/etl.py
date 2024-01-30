@@ -79,6 +79,33 @@ def process(cur, conn, filepath):
                 # print(insert_statement)
                 cur.execute(insert_statement)
 
+                # Insert data into tables here
+                insert_statement = f"""
+                    INSERT INTO repositaries (
+                        repo_id,
+                        name,
+                        actor_id,
+                        create_at
+                    ) VALUES ('{each["repo"]["id"]}', '{each["name"]}', '{each["actor"]["id"]}', '{each["create_at"]}')
+                    ON CONFLICT (id) DO NOTHING
+                """
+                # print(insert_statement)
+                cur.execute(insert_statement)
+
+                # Insert data into tables here
+                insert_statement = f"""
+                    INSERT INTO payload (
+                        id,
+                        issue,
+                        url,
+                        action,
+                        repo_id
+                    ) VALUES ('{each["payload"]["id"]}', '{each["payload"]["issue"]}', '{each["payload"]["url"]}', '{each["action"]}','{each["repo"]["id"]}')
+                    ON CONFLICT (id) DO NOTHING
+                """
+                # print(insert_statement)
+                cur.execute(insert_statement)
+                
                 conn.commit()
 
 
