@@ -1,8 +1,9 @@
 # Data modeling
-Create data modeling
-run create table.py
-run etl.py
-select data from data files (JSON) to put in create table.py
+> Create data modeling
+1. run docker
+2. run create table.py
+3. run etl.py
+4. select data from data files (JSON) to put in create table.py
 
 # run docker
 docker run -p 8080:80 nginx (run web server nginx) by mapping port 8080 to 80 
