@@ -56,7 +56,7 @@ def process(cur, conn, filepath):
                         each["created_at"],
                     )
 
-                # Insert data into tables here
+                # Insert data into "actors" tables here
                 insert_statement = f"""
                     INSERT INTO actors (
                         id,
@@ -67,7 +67,7 @@ def process(cur, conn, filepath):
                 # print(insert_statement)
                 cur.execute(insert_statement)
 
-                # Insert data into tables here
+                # Insert data into "events" tables here
                 insert_statement = f"""
                     INSERT INTO events (
                         id,
@@ -79,7 +79,7 @@ def process(cur, conn, filepath):
                 # print(insert_statement)
                 cur.execute(insert_statement)
 
-                # Insert data into tables here
+                # Insert data into "repositories" tables here
                 insert_statement = f"""
                     INSERT INTO repositories (
                         id,
