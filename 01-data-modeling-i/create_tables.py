@@ -9,7 +9,6 @@ PostgresConn = NewType("PostgresConn", psycopg2.extensions.connection)
 table_drop_events = "DROP TABLE IF EXISTS events CASCADE"
 table_drop_actors = "DROP TABLE IF EXISTS actors CASCADE"
 table_drop_repositories = "DROP TABLE IF EXISTS repositories CASCADE"
-table_drop_payload = "DROP TABLE IF EXISTS payload CASCADE"
 
 table_create_actors = """
     CREATE TABLE IF NOT EXISTS actors (
@@ -46,7 +45,6 @@ drop_table_queries = [
     table_drop_events,
     table_drop_actors,
     table_drop_repositories,
-    table_drop_payload,
 ]
 
 
