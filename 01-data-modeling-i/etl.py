@@ -60,8 +60,9 @@ def process(cur, conn, filepath):
                 insert_statement = f"""
                     INSERT INTO actors (
                         id,
-                        login
-                    ) VALUES ({each["actor"]["id"]}, '{each["actor"]["login"]}')
+                        login,
+                        url
+                    ) VALUES ({each["actor"]["id"]}, '{each["actor"]["login"]}', '{each["actor"]["url"]}')
                     ON CONFLICT (id) DO NOTHING
                 """
                 # print(insert_statement)
