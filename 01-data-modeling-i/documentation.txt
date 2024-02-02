@@ -1,11 +1,18 @@
 1. เริ่มจากการสำรวจ data ทั้งหมด เพื่อทำการออกแบบ Data model ของ data ชุดนี้
 2. สร้างตารางจากการออกแบบ data model ให้มีความสัมพันธ์กัน 
-    2.1 มีตารางทั้งหมด 3 ตาราง ประกอบด้วย actors, events, และ repositories
-    - actors สามารถมีได้หลาย events
-    - actors สามารถมีได้หลาย repositories
+    2.1 มีตารางทั้งหมด 3 ตาราง ประกอบด้วย 
+        > actors
+        > events
+        > repositories ประกอบไปด้วย 4 columns : id, name, created_at, actor_id
+    2.2 โดยแต่ละตารางจะมีความสัมพันธ์ ดังนี้
+        - actors สามารถมีได้หลาย events
+        - actors สามารถมีได้หลาย repositories 
 3. ทำการ run web server ผ่าน nginx mapping port 8080
 4. ต่อมาทำการ run docker compose ที่มีการติดตั้ง postgres เพื่อให้สามารถใช้ฐานข้อมูลนี้ได้
 5. config ไฟล์ create_table.py เพื่อทำการสร้างตารางผ่าน python 
-    5.1 โดยทำการเพิ่มตาราง repositories ขึ้นมา ประกอบไปด้วย 4 columns : id, name, created_at, actor_id
-6. และจัดการกับไฟล์ etl.py เพื่อให้สามารถจัดการกับข้อมูลได้
+    5.1 โดยทำการเพิ่มตาราง repositories ขึ้นมา ซึ่งมี columns ทั้งหมด 4 columns ตามที่ออกแบบไว้ข้างต้น
+        มี repositories_id เป็น primary key และ actor_id เป็น foriegn key 
+6. และจัดการกับไฟล์ etl.py เพื่อให้สามารถจัดการกับข้อมูลได้ ด้วยการ insert data from JSON files
+    - ใช้คำสั่ง {'each["KEY"]'} โดยสามารถใส่ Key ที่ต้องการจะดึง values มาแสดงบน database 
 ึ7. เปิด postgres ผ่าน web application ที่ port 8080 และสามารถใช้งาน postgres ผ่าน web ได้
+    - ทดสอบ database ด้วยคำสั่ง select * from repositories 
