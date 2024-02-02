@@ -5,6 +5,7 @@
     - actors สามารถมีได้หลาย repositories
 3. ทำการ run web server ผ่าน nginx mapping port 8080
 4. ต่อมาทำการ run docker compose ที่มีการติดตั้ง postgres เพื่อให้สามารถใช้ฐานข้อมูลนี้ได้
-5. config ไฟล์ create_table.py เพื่อทำการสร้างตารางผ่าน python โดยทำการเพิ่มตาราง repositories ขึ้นมา
+5. config ไฟล์ create_table.py เพื่อทำการสร้างตารางผ่าน python 
+    5.1 โดยทำการเพิ่มตาราง repositories ขึ้นมา ประกอบไปด้วย 4 columns : id, name, created_at, actor_id
 6. และจัดการกับไฟล์ etl.py เพื่อให้สามารถจัดการกับข้อมูลได้
 ึ7. เปิด postgres ผ่าน web application ที่ port 8080 และสามารถใช้งาน postgres ผ่าน web ได้
