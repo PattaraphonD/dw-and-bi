@@ -1,9 +1,9 @@
 1. เริ่มจากการสำรวจ data ทั้งหมด เพื่อทำการออกแบบ Data model ของ data ชุดนี้
 2. สร้างตารางจากการออกแบบ data model ให้มีความสัมพันธ์กัน 
     2.1 มีตารางทั้งหมด 3 ตาราง ประกอบด้วย 
-        > actors
-        > events
-        > repositories ประกอบไปด้วย 4 columns : id, name, created_at, actor_id
+        > actors ประกอบด้วย 3 columns : id(pk), login, url
+        > events ประกอบด้วย 3 columns : id(pk), type, actor_id(fk)
+        > repositories ประกอบด้วย 4 columns : id(pk), name, created_at, actor_id(fk)
     2.2 โดยแต่ละตารางจะมีความสัมพันธ์ ดังนี้
         - actors สามารถมีได้หลาย events
         - actors สามารถมีได้หลาย repositories 
