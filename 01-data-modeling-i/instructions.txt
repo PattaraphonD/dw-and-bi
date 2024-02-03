@@ -1,6 +1,5 @@
 # To run data modeling project
-1. Connect web server "nginx" and mapping port to 8080
-2. Run docker compose file (popstgres) with > $ docker compose up
-3. Add another teminal to run python file that connect to postgres
-4. Run create_table.py with > $ python create_table.py
-5. Run etl.py with > $ python etl.py
+1. Run docker compose file (popstgres) with > $ docker compose up
+2. Add another teminal to run python file that connect to postgres
+3. Run create_table.py with > $ python create_table.py
+4. Run etl.py with > $ python etl.py
