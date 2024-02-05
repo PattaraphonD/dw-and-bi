@@ -1,0 +1,24 @@
+# To run data modeling project
+1. Run docker compose file (popstgres) with > $ docker compose up
+2. Add another teminal to run python file that connect to postgres
+3. Run create_table.py with > $ python create_table.py
+4. Run etl.py with > $ python etl.py
+
+# Documentation
+1. เริ่มจากการสำรวจ data ทั้งหมด เพื่อทำการออกแบบ Data model ของ data ชุดนี้
+2. สร้างตารางจากการออกแบบ data model ให้มีความสัมพันธ์กัน 
+    2.1 มีตารางทั้งหมด 3 ตาราง ประกอบด้วย 
+        > actors ประกอบด้วย 3 columns : id(pk), login, url
+        > events ประกอบด้วย 3 columns : id(pk), type, actor_id(fk)
+        > repositories ประกอบด้วย 4 columns : id(pk), name, created_at, actor_id(fk)
+    2.2 โดยแต่ละตารางจะมีความสัมพันธ์ ดังนี้
+        - actors สามารถมีได้หลาย events
+        - actors สามารถมีได้หลาย repositories 
+3. ทำการ run docker compose ที่มีการติดตั้ง postgres เพื่อให้สามารถใช้ฐานข้อมูลนี้ได้
+4. config ไฟล์ create_table.py เพื่อทำการสร้างตารางผ่าน python 
+    5.1 โดยทำการเพิ่มตาราง repositories ขึ้นมา ซึ่งมี columns ทั้งหมด 4 columns ตามที่ออกแบบไว้ข้างต้น
+        มี repositories_id เป็น primary key และ actor_id เป็น foriegn key 
+5. และจัดการกับไฟล์ etl.py เพื่อให้สามารถจัดการกับข้อมูลได้ ด้วยการ insert data from JSON files
+    - ใช้คำสั่ง {'each["KEY"]'} โดยสามารถใส่ Key ที่ต้องการจะดึง values มาแสดงบน database 
+ึ6. เปิด postgres ผ่าน web application ที่ port 8080 และสามารถใช้งาน postgres ผ่าน web ได้
+    - ทดสอบ database ด้วยคำสั่ง select * from repositories 
