@@ -5,10 +5,12 @@ from typing import List
 
 from cassandra.cluster import Cluster
 
+### Create Tables
 
-table_drop = "DROP TABLE events"
+table_drop_events = "DROP TABLE events"
+table_drop_repos = "DROP TABLE repos"
 
-table_create = """
+table_create_events = """
     CREATE TABLE IF NOT EXISTS events
     (
         id text,
@@ -21,11 +23,23 @@ table_create = """
     )
 """
 
+table_create_repos = """
+    CREATE TABLE IF NOT EXISTS repos
+    (
+        id text,
+        name text,
+        url text,
+        PRIMARY KEY (id)
+    )
+"""
+
 create_table_queries = [
-    table_create,
+    table_create_events,
+    table_create_repos,
 ]
 drop_table_queries = [
-    table_drop,
+    table_drop_events,
+    table_drop_repos,
 ]
 
 def drop_tables(session):
@@ -43,6 +57,7 @@ def create_tables(session):
         except Exception as e:
             print(e)
 
+### ETL
 
 def get_files(filepath: str) -> List[str]:
     """
@@ -73,7 +88,26 @@ def process(session, filepath):
                 print(each["id"], each["type"], each["actor"]["login"])
 
                 # Insert data into tables here
+                insert_repos_statement  = f"""
+                    INSERT INTO repos (
+                        id,
+                        name,
+                        url
+                    ) VALUES ('{each["repo"]["id"]}', '{each["repo"]["name"]}', '{each["repo"]["url"]}')
+                    ON CONFLICT (id) DO NOTHING
+                """
+                session.execute(insert_repos_statement)
 
+                # Insert data into tables here
+                insert_events_statement  = f"""
+                    INSERT INTO events (
+                        id,
+                        type,
+                        public
+                    ) VALUES ('{each["id"]}', '{each["name"]}', {each["public"]})
+                    ON CONFLICT (id) DO NOTHING
+                """
+                session.execute(insert_events_statement)
 
 def insert_sample_data(session):
     query = f"""
@@ -120,7 +154,6 @@ def main():
 
     for row in rows:
         print(row)
-
 
 if __name__ == "__main__":
     main()
