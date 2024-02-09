@@ -33,11 +33,8 @@ table_create = """
         repo_url text,
         created_at timestamp,
         is_public boolean,
-        PRIMARY KEY (
-            id,
-            type
-        )
-    )
+        PRIMARY KEY (id, type)
+    ) 
 """
 create_table_queries = [
     table_create,
