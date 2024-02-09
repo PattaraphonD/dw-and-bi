@@ -102,8 +102,10 @@ def process(session, filepath):
                         repo_url,
                         created_at,
                         is_public
-                    ) VALUES ('{each["id"]}', '{each["type"]}', '{each["actor"]["id"]}', '{each["actor"]["login"]}','{each["repo"]["id"]}',
-                              '{each["repo"]["name"]}', '{each["repo"]["url"]}', '{each["created_at"]}', {each["public"]})
+                    ) VALUES ('{each["id"]}', '{each["type"]}', 
+                              '{each["actor"]["id"]}', '{each["actor"]["login"]}',
+                              '{each["repo"]["id"]}', '{each["repo"]["name"]}', '{each["repo"]["url"]}', 
+                              '{each["created_at"]}', {each["public"]})
                 """
                 session.execute(query)
 
