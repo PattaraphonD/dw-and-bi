@@ -18,7 +18,7 @@
     - repo_url text,
     - created_at timestamp,
     - is_public boolean
-โดยมี Composite primary key เป็น id และ type
+    > โดยมี Composite primary key เป็น id และ type 
 - ทำการทดสอบด้วยการ query cql บน $ cqlsh ด้วยคำสั่ง
     - select * from github.events.events limit 10
     - select repo_url from github.events.events limit 10
