@@ -18,7 +18,7 @@
     - repo_url text,
     - created_at timestamp,
     - is_public boolean
-> โดยมี Composite primary key เป็น id และ type 
+> โดยมี Partition key เป็น id และ clustering key เป็น type
 - Insert ข้อมูลอ้างอิงจาก JSON files 
     - จากการ loop files in folder data ```for each in data: ``` 
     - และใช้ syntax ```{'each["KEY"]'}``` โดยสามารถใส่ Key ที่ต้องการจะดึง values มาแสดงบน database
