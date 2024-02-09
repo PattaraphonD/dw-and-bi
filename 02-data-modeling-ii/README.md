@@ -18,7 +18,10 @@
     - repo_url text,
     - created_at timestamp,
     - is_public boolean
-    > โดยมี Composite primary key เป็น id และ type 
+> โดยมี Composite primary key เป็น id และ type 
+- Insert ข้อมูลอ้างอิงจาก JSON files 
+    - จากการ loop files in folder data ```for each in data: ``` 
+    - และใช้ syntax ```{'each["KEY"]'}``` โดยสามารถใส่ Key ที่ต้องการจะดึง values มาแสดงบน database
 - ทำการทดสอบด้วยการ query cql บน $ cqlsh ด้วยคำสั่ง
     - select * from github.events.events limit 10
     - select repo_url from github.events.events limit 10
