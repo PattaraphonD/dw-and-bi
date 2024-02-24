@@ -13,3 +13,7 @@ add one more new terminal *dont close terminal with postgres
 # run python
 run python file with > python filename
 config or add more code in python file (etl & create table)
+
+# to create virtual ENV
+- python 0m venv ENV
+- source ENV/bin/activate
