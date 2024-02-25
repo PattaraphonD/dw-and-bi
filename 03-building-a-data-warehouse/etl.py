@@ -36,13 +36,13 @@ def main(dataset_id, table_id, file_path):
     # keyfile = os.environ.get("KEYFILE_PATH")
     #
     # แต่เพื่อความง่ายเราสามารถกำหนด File Path ไปได้เลยตรง ๆ
-    keyfile = "YOUR_KEYFILE_PATH"
+    keyfile = "../credentials/credentials/stalwart-summer-413911-swu-ds525-load-data-to-bigquer-70a5d392516f.json"
     service_account_info = json.load(open(keyfile))
     credentials = service_account.Credentials.from_service_account_info(service_account_info)
 
     # โค้ดส่วนนี้จะเป็นการสร้าง Client เชื่อมต่อไปยังโปรเจค GCP ของเรา โดยใช้ Credentials ที่
     # สร้างจากโค้ดข้างต้น
-    project_id = "YOUR_GCP_PROJECT"
+    project_id = "stalwart-summer-413911"
     client = bigquery.Client(
         project=project_id,
         credentials=credentials,
@@ -51,8 +51,8 @@ def main(dataset_id, table_id, file_path):
     # โค้ดส่วนนี้เป็นการ Configure Job ที่เราจะส่งไปทำงานที่ BigQuery โดยหลัก ๆ เราก็จะกำหนดว่า
     # ไฟล์ที่เราจะโหลดขึ้นไปมีฟอร์แมตอะไร มี Schema หน้าตาประมาณไหน
     job_config = bigquery.LoadJobConfig(
-        skip_leading_rows=1,
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+        skip_leading_rows=1, # skip header
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE, # truncate = replace
         source_format=bigquery.SourceFormat.CSV,
         schema=[
             bigquery.SchemaField("id", bigquery.SqlTypeNames.STRING),
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     with open("github_events.csv", "w") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(["id", "type"])
+        writer.writerow(["id", "type"]) # name of column
 
         for datafile in all_files:
             with open(datafile, "r") as f:
@@ -86,4 +86,4 @@ if __name__ == "__main__":
                 for each in data:
                     writer.writerow([each["id"], each["type"]])
 
-    main(dataset_id="github", table_id, file_path)
+    main(dataset_id="github", table_id="events", file_path="github_events.csv")
