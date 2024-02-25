@@ -36,7 +36,7 @@ def main(dataset_id, table_id, file_path):
     # keyfile = os.environ.get("KEYFILE_PATH")
     #
     # แต่เพื่อความง่ายเราสามารถกำหนด File Path ไปได้เลยตรง ๆ
-    keyfile = "../credentials/credentials/stalwart-summer-413911-swu-ds525-load-data-to-bigquer-70a5d392516f.json"
+    keyfile = "../credentials/stalwart-summer-413911-swu-ds525-load-data-to-bigquer-70a5d392516f.json"
     service_account_info = json.load(open(keyfile))
     credentials = service_account.Credentials.from_service_account_info(service_account_info)
 
@@ -57,6 +57,7 @@ def main(dataset_id, table_id, file_path):
         schema=[
             bigquery.SchemaField("id", bigquery.SqlTypeNames.STRING),
             bigquery.SchemaField("type", bigquery.SqlTypeNames.STRING),
+            bigquery.SchemaField("actor", bigquery.SqlTypeNames.STRING),
         ],
     )
 
@@ -78,12 +79,19 @@ if __name__ == "__main__":
 
     with open("github_events.csv", "w") as csv_file:
         writer = csv.writer(csv_file)
-        writer.writerow(["id", "type"]) # name of column
+        writer.writerow(["id", 
+                         "type", 
+                         "login",
+        ]) # name of column
 
         for datafile in all_files:
             with open(datafile, "r") as f:
                 data = json.loads(f.read())
                 for each in data:
-                    writer.writerow([each["id"], each["type"]])
+                    writer.writerow([
+                        each["id"], 
+                        each["type"],
+                        each["actor"]["login"],
+                    ])
 
     main(dataset_id="github", table_id="events", file_path="github_events.csv")
