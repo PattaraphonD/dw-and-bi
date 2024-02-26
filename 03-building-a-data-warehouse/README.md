@@ -39,7 +39,7 @@ python etl.py
 "../credentials/stalwart-summer-413911-swu-ds525-load-data-to-bigquer-70a5d392516f.json"
 ```
 
-- update project_id
+- update project_id (name the dataset project from bigquerry)
 ```sh 
 "stalwart-summer-413911"
 ```
@@ -68,7 +68,7 @@ python etl.py
         ])
 ```
 
-- update extract data including new column
+- update extracting data including new column
 ```sh 
 for datafile in all_files:
             with open(datafile, "r") as f:
