@@ -33,6 +33,8 @@ python etl.py
 ### Credetials
 - upload **credential file** which received from creating service account on bigquerry
 
+![Alt text](image-1.png)
+
 ### ETL script
 - update keyfile from path in folder credentials
 ```sh 
@@ -80,3 +82,5 @@ for datafile in all_files:
                         each["actor"]["login"],
                     ])
 ```
+
+![Alt text](image.png)
