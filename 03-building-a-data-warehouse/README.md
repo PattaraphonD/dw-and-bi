@@ -83,4 +83,10 @@ for datafile in all_files:
                     ])
 ```
 
+## Bigquerry 
+
 ![Alt text](image.png)
+
+### test with sql commands
+
+![Alt text](image-2.png)
