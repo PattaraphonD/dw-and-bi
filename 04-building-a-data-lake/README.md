@@ -1,5 +1,11 @@
 # Building a Data Lake
 
+## change directory to project 04-building-a-data-lake
+
+```sh
+$ cd 04-building-a-data-lake
+```
+
 ## run docker compose
 
 ```sh
