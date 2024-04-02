@@ -150,8 +150,6 @@ def _process(**context):
                 conn.commit()
 
 
-
-
 with DAG(
     "etl",
     start_date=timezone.datetime(2024, 4, 2),
