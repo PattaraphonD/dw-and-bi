@@ -55,10 +55,10 @@ airflow-webserver:
         condition: service_completed_successfully
 ```
 
-## configuration for etl.py file
+## Configuration for etl.py file
 
 ### Creating functions
-- get files
+> get files
 ```
 get_files = PythonOperator(
         task_id="get_files",
@@ -70,7 +70,7 @@ get_files = PythonOperator(
     )
 ```
 
-- create tables
+> create tables
 ```
 create_tables = PythonOperator(
         task_id="create_tables",
@@ -78,7 +78,7 @@ create_tables = PythonOperator(
     )
 ```
 
-- process
+> process
 ```
 process = PythonOperator(
         task_id="process",
@@ -95,7 +95,8 @@ This process is for maintaining the credentiallity
     cur = conn.cursor()
 ```
 
-### Creating DAGs to automate workflow with Airflow
+### Creating DAG to automate workflow with Airflow
+> Creating DAG
 ```
 with DAG(
     "etl",
@@ -104,6 +105,32 @@ with DAG(
     tags=["swu"],
 ):
 ```
+> Creating operators and assigning tasks based on functions
+```
+    start = EmptyOperator(task_id="start")
+
+    get_files = PythonOperator(
+        task_id="get_files",
+        python_callable=_get_files,
+        op_kwargs={
+            "filepath": "/opt/airflow/dags/data"
+        },
+        # op_args=["/opt/airflow/dags/data"] # for list
+    )
+
+    create_tables = PythonOperator(
+        task_id="create_tables",
+        python_callable=_create_tables,
+    )
+
+    process = PythonOperator(
+        task_id="process",
+        python_callable=_process,
+    )
+
+    end = EmptyOperator(task_id="end")
+```
+> Setting workflow
 ```
 start >> [get_files, create_tables] >> process >> end
 ```
