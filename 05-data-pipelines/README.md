@@ -1,21 +1,26 @@
 # Instruction 
+
+> Run Docker Compose
 ```
 $ docker compose up
 ```
 
-add data to dags folder
+> Add data to dags folder (or API)
 
-open Apache Airflow web server from port 8080
+> Open Apache Airflow web server from port 8080
 
-open elt.py 
+> Open elt.py 
 to config script and automate with airflow
 
-run docker compose exec postgres bash
+> To excecute postgres on bash shell
 to access postgres and be able to query with bash
+```
+$ docker compose exec postgres bash
+```
 
 # Documentation
 
-## configuration for Docker Compose
+## Configuration for Docker Compose
 
 ### Mounting volumes into the container, including dags, logs, config, and plugins
 
@@ -29,7 +34,7 @@ to access postgres and be able to query with bash
 
 ### Managing Apache Airflow's web server
 
-mapping Apache Airflow's web server to port 8080 and setting helthcheck
+Mapping Apache Airflow's web server to port 8080 and setting helthcheck
 
 ```
 airflow-webserver:
@@ -82,6 +87,7 @@ process = PythonOperator(
 ```
 
 ### Creating connection with hook and applying on create tables and process function
+This process is for maintaining the credentiallity
 ```
 # connect to postgres
     hook = PostgresHook(postgres_conn_id="my_postgres_conn")
