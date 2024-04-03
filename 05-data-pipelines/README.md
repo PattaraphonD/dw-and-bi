@@ -1,10 +1,11 @@
 # Instruction 
-
-docker compose up
+```
+$ docker compose up
+```
 
 add data to dags folder
 
-open airflow from port 8080
+open Apache Airflow web server from port 8080
 
 open elt.py 
 to config script and automate with airflow
@@ -14,14 +15,73 @@ to access postgres and be able to query with bash
 
 # Documentation
 
-in etl.py file
+## configuration for Docker Compose
 
-create function
+### Mounting volumes into the container, including dags, logs, config, and plugins
+
+```
+  volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+```
+
+### Managing Apache Airflow's web server
+
+mapping Apache Airflow's web server to port 8080 and setting helthcheck
+
+```
+airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+```
+
+## configuration for etl.py file
+
+### Creating functions
 - get files
-- create tables
-- process
+```
+get_files = PythonOperator(
+        task_id="get_files",
+        python_callable=_get_files,
+        op_kwargs={
+            "filepath": "/opt/airflow/dags/data"
+        },
+        # op_args=["/opt/airflow/dags/data"] # for list
+    )
+```
 
-create connection with hook and apply on create tables and process function
+- create tables
+```
+create_tables = PythonOperator(
+        task_id="create_tables",
+        python_callable=_create_tables,
+    )
+```
+
+- process
+```
+process = PythonOperator(
+        task_id="process",
+        python_callable=_process,
+    )
+```
+
+### Creating connection with hook and applying on create tables and process function
 ```
 # connect to postgres
     hook = PostgresHook(postgres_conn_id="my_postgres_conn")
@@ -29,6 +89,15 @@ create connection with hook and apply on create tables and process function
     cur = conn.cursor()
 ```
 
-create DAG to begin with Airflow 
+### Creating DAGs to automate workflow with Airflow
+```
+with DAG(
+    "etl",
+    start_date=timezone.datetime(2024, 4, 2),
+    schedule="@daily",
+    tags=["swu"],
+):
+```
+```
 start >> [get_files, create_tables] >> process >> end
-@daily
+```
