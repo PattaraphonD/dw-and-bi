@@ -34,9 +34,16 @@ All checks passed!
 
 read all models and show in destination
 
+create model 
+
 run automate test
 dbt test
 
 create layer
 > staging
+create model in staging
+
 > marts
+
+materization
+by staging and marts
