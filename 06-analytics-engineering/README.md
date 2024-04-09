@@ -64,4 +64,23 @@ to wait for transforming and fload in data warehouse
 
 - On dbt, we can use like SQL client to query
 
-- The pros of dbt is making the SQL script reproducable
+- The pros of dbt is making the SQL script reproducible
+
+- First, i've created the staging sql script 
+```
+select * from {{ source('jaffle_shop', 'jaffle_shop_customers') }}
+```
+- Then I created another sql script in data mart which reference the sql script from staging layer
+```
+select
+    o.id as order_id
+    , o.user_id
+    , c.first_name
+    , c.last_name
+    , o.order_date
+    , o.status as order_status
+
+from {{ ref('stg__jaffle_shop_orders') }} as o
+join {{ ref('stg__jaffle_shop_customers') }} as c
+on o.user_id = c.id
+```
