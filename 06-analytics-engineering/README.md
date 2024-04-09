@@ -57,6 +57,27 @@ create model in staging
 
 # Documentation
 
+- Create init.sql file to create table and insert data 
+```
+CREATE TABLE IF NOT EXISTS jaffle_shop_customers (
+    id INT PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT
+);
+
+INSERT INTO jaffle_shop_customers (
+    id,
+    first_name,
+    last_name
+)
+VALUES
+    (1, 'Michael', 'P.'),
+    (2, 'Shawn', 'M.'),
+    (3, 'Kathleen', 'P.'),
+    (4, 'Jimmy', 'C.'),
+    (5, 'Katherine', 'R.'),
+```
+
 - Create file .sql to contain SQL script to run on dbt
 
 in staging folder contain data which was prepared in staging layer 
