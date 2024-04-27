@@ -24,7 +24,7 @@ from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 def _get_accident_api():
     api_key = "DQdXFnbDsgMU3QEmQoDM9E1KvECWJNZK"
     headers = {"api-key": api_key}
-    params = {"resource_id": "d1ab8a36-c5f7-4efb-b613-63310054b0bc", "limit": 10000}
+    params = {"resource_id": "d1ab8a36-c5f7-4efb-b613-63310054b0bc"}
 
     response = requests.get("https://opend.data.go.th/get-ckan/datastore_search", params, headers=headers)
     data = response.json()
@@ -67,8 +67,8 @@ get_api_file = PythonOperator(
 
 upload_to_gcs = LocalFilesystemToGCSOperator(
     task_id="upload_to_gcs",
-    src="/opt/airflow/dags/RoadAccident_2566.json",
-    dst="RoadAccident_2566.json",
+    src="/opt/airflow/dags/RoadAccident_2566.csv",
+    dst="RoadAccident_2566.csv",
     bucket="swu-ds525-8888",
     gcp_conn_id="my_gcp_conn",
     dag=dag,
