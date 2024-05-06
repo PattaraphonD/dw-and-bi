@@ -66,7 +66,7 @@ def _get_files_api():
 
 with DAG(
     "acc_api_etl_pipeline",
-    start_date=timezone.datetime(2024, 5, 6),
+    start_date=timezone.datetime(2024, 5, 7),
     schedule="@quarterly",
     tags=["DS525"],
 ) as dag:
@@ -86,6 +86,15 @@ with DAG(
         dag=dag,
     )
 
+    create_bq_raw_dataset = BigQueryCreateEmptyDatasetOperator(
+        task_id='create_bq_raw_dataset',
+        dataset_id='project_accident_raw',  # specify the dataset ID
+        project_id='stalwart-summer-413911',  # specify your BigQuery project ID
+        location='asia-southeast1',  # specify the location for the dataset
+        gcp_conn_id='my_gcp_conn',  # specify the connection ID for GCP
+        dag=dag,
+    )
+
     create_bq_dataset = BigQueryCreateEmptyDatasetOperator(
         task_id='create_bq_dataset',
         dataset_id='project_accident',  # specify the dataset ID
@@ -99,7 +108,7 @@ with DAG(
         task_id='load_to_bq',
         bucket='swu-ds525-8888',
         source_objects=['RoadAccident_{{ execution_date.strftime("%Y-%m-%d") }}*.csv'],  # Use wildcard pattern
-        destination_project_dataset_table='stalwart-summer-413911.project_accident.accident_case_original',
+        destination_project_dataset_table='stalwart-summer-413911.project_accident_raw.accident_case_original',
         source_format='CSV',
         create_disposition='CREATE_IF_NEEDED',
         write_disposition='WRITE_TRUNCATE',  # Options: WRITE_TRUNCATE, WRITE_APPEND, WRITE_EMPTY
@@ -108,14 +117,14 @@ with DAG(
     )
 
     table_prep_sql = f"""
-    ALTER TABLE `project_accident.accident_case_original`
+    ALTER TABLE `project_accident_raw.accident_case_original`
     DROP COLUMN _id,
     DROP COLUMN Dead_Year___________________________________________,
     DROP COLUMN Date_Rec,
     DROP COLUMN Risk_Helmet,
     DROP COLUMN Risk_Safety_Belt;
 
-    ALTER TABLE `project_accident.accident_case_original`
+    ALTER TABLE `project_accident_raw.accident_case_original`
     RENAME COLUMN Dead_Conso_Id TO acc_case_id,
     RENAME COLUMN DEAD_YEAR TO psn_dead_year,
     RENAME COLUMN Age TO psn_age,
@@ -149,7 +158,7 @@ with DAG(
         case_long,
         icd_code,
         case_vehicle
-    FROM `project_accident.accident_case_original`
+    FROM `project_accident_raw.accident_case_original`
     );
     """
 
@@ -166,13 +175,13 @@ with DAG(
             psn_tumbol, 
             psn_district,
             psn_province,
-        FROM `project_accident.accident_case_original`
+        FROM `project_accident_raw.accident_case_original`
     );
     """
 
     table_prep = BigQueryExecuteQueryOperator(
         task_id='table_prep_sql',
-        sql=tranf_sql,
+        sql=table_prep_sql,
         use_legacy_sql=False,
         gcp_conn_id='my_gcp_conn',
         dag=dag,
@@ -194,4 +203,4 @@ with DAG(
         dag=dag,
     )
 
-    get_files_api >> upload_to_gcs >> create_bq_dataset >> load_to_bq >> table_prep >> [create_case_table, create_person_table] 
+    get_files_api >> upload_to_gcs >> [create_bq_raw_dataset, create_bq_dataset] >> load_to_bq >> table_prep >> [create_case_table, create_person_table] 
