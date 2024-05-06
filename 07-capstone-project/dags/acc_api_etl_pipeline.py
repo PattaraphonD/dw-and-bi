@@ -107,7 +107,7 @@ with DAG(
         dag=dag,
     )
 
-    tranf_sql = f"""
+    table_prep_sql = f"""
     ALTER TABLE `project_accident.accident_case_original`
     DROP COLUMN _id,
     DROP COLUMN Dead_Year___________________________________________,
@@ -133,9 +133,9 @@ with DAG(
     RENAME COLUMN Acclong TO case_long,
     RENAME COLUMN Ncause TO icd_code,
     RENAME COLUMN Vehicle_Merge_Final TO case_vehicle;
-
-   -- Create a new table with the desired partitioning
-    CREATE TABLE `project_accident.case_info_temp`
+    """
+    create_case_sql = f"""
+    CREATE TABLE `project_accident.case_info`
     PARTITION BY DATE(actual_dead_date)
     AS (
     SELECT 
@@ -151,15 +151,11 @@ with DAG(
         case_vehicle
     FROM `project_accident.accident_case_original`
     );
+    """
 
-    -- Drop the existing table if it exists
-    DROP TABLE IF EXISTS `project_accident.case_info`;
-
-    -- Rename the new table to replace the existing one
-    ALTER TABLE `project_accident.case_info_temp`
-    RENAME TO `case_info`;
-
+    create_person_sql = f"""
     CREATE OR REPLACE TABLE `project_accident.personal_info`
+    PARTITION BY RANGE_BUCKET(psn_dead_year, GENERATE_ARRAY(2000, 2050, 1))
     AS (
         SELECT 
             acc_case_id,
@@ -174,12 +170,28 @@ with DAG(
     );
     """
 
-    transf_process = BigQueryExecuteQueryOperator(
-        task_id='transf_porcess',
+    table_prep = BigQueryExecuteQueryOperator(
+        task_id='table_prep_sql',
         sql=tranf_sql,
         use_legacy_sql=False,
         gcp_conn_id='my_gcp_conn',
         dag=dag,
     )
 
-    get_files_api >> upload_to_gcs >> create_bq_dataset >> load_to_bq >> transf_process
+    create_case_table = BigQueryExecuteQueryOperator(
+        task_id='create_case_table',
+        sql=create_case_sql,
+        use_legacy_sql=False,
+        gcp_conn_id='my_gcp_conn',
+        dag=dag,
+    )
+
+    create_person_table = BigQueryExecuteQueryOperator(
+        task_id='create_person_table',
+        sql=create_person_sql,
+        use_legacy_sql=False,
+        gcp_conn_id='my_gcp_conn',
+        dag=dag,
+    )
+
+    get_files_api >> upload_to_gcs >> create_bq_dataset >> load_to_bq >> table_prep >> [create_case_table, create_person_table] 
