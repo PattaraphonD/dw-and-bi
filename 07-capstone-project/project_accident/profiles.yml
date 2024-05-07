@@ -1,0 +1,28 @@
+proj_accident:
+  outputs:
+    dev:
+      dataset: project_accident
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: /workspaces/dw-and-bi/credentials/stalwart-summer-413911-gcs-bigquery-dbde125c4540.json
+      location: asia-southeast1
+      method: service-account
+      priority: interactive
+      project: stalwart-summer-413911
+      threads: 4
+      type: bigquery
+  target: dev
+project_accident:
+  outputs:
+    dev:
+      dataset: project_accident
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: /workspaces/dw-and-bi/credentials/stalwart-summer-413911-gcs-bigquery-dbde125c4540.json
+      location: asia-southeast1
+      method: service-account
+      priority: interactive
+      project: stalwart-summer-413911
+      threads: 4
+      type: bigquery
+  target: dev

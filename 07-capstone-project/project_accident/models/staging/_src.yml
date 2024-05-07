@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: project_accident 
+    schema: project_accident
+    database: stalwart-summer-413911
+    tables: 
+      - name: case_info
+      - name: personal_info

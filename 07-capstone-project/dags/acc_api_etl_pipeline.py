@@ -1,4 +1,5 @@
 from airflow import DAG
+from airflow.operators.empty import EmptyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
@@ -23,7 +24,7 @@ from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
 
 def _get_files_api():
-    api_key = "DQdXFnbDsgMU3QEmQoDM9E1KvECWJNZK"
+    api_key = "dUJUhi3y5MkxpSEhT5Xtthxan6fxxLI4"
     headers = {"api-key": api_key}
     params1 = {"resource_id": "d1ab8a36-c5f7-4efb-b613-63310054b0bc", "limit": 10000}
     params2 = {"resource_id": "5af00f52-ed10-409e-b549-cbf169f52b0d", "limit": 2500}
@@ -71,6 +72,9 @@ with DAG(
     tags=["DS525"],
 ) as dag:
 
+    start = EmptyOperator(task_id='start')
+    end = EmptyOperator(task_id='end')
+
     get_files_api = PythonOperator(
         task_id="get_files_api",
         python_callable=_get_files_api,
@@ -95,6 +99,18 @@ with DAG(
         dag=dag,
     )
 
+    load_raw_to_bq = GCSToBigQueryOperator(
+        task_id='load_raw_to_bq',
+        bucket='swu-ds525-8888',
+        source_objects=['RoadAccident_{{ execution_date.strftime("%Y-%m-%d") }}*.csv'],  # Use wildcard pattern
+        destination_project_dataset_table='stalwart-summer-413911.project_accident_raw.accident_case_original',
+        source_format='CSV',
+        create_disposition='CREATE_IF_NEEDED',
+        write_disposition='WRITE_TRUNCATE',  # Options: WRITE_TRUNCATE, WRITE_APPEND, WRITE_EMPTY
+        gcp_conn_id="my_gcp_conn",
+        dag=dag,
+    )
+
     create_bq_dataset = BigQueryCreateEmptyDatasetOperator(
         task_id='create_bq_dataset',
         dataset_id='project_accident',  # specify the dataset ID
@@ -108,7 +124,7 @@ with DAG(
         task_id='load_to_bq',
         bucket='swu-ds525-8888',
         source_objects=['RoadAccident_{{ execution_date.strftime("%Y-%m-%d") }}*.csv'],  # Use wildcard pattern
-        destination_project_dataset_table='stalwart-summer-413911.project_accident_raw.accident_case_original',
+        destination_project_dataset_table='stalwart-summer-413911.project_accident.full_accident_case',
         source_format='CSV',
         create_disposition='CREATE_IF_NEEDED',
         write_disposition='WRITE_TRUNCATE',  # Options: WRITE_TRUNCATE, WRITE_APPEND, WRITE_EMPTY
@@ -116,15 +132,17 @@ with DAG(
         dag=dag,
     )
 
+    follow_create_dataset = EmptyOperator(task_id='follow_create_dataset')
+
     table_prep_sql = f"""
-    ALTER TABLE `project_accident_raw.accident_case_original`
+    ALTER TABLE `project_accident.full_accident_case`
     DROP COLUMN _id,
     DROP COLUMN Dead_Year___________________________________________,
     DROP COLUMN Date_Rec,
     DROP COLUMN Risk_Helmet,
     DROP COLUMN Risk_Safety_Belt;
 
-    ALTER TABLE `project_accident_raw.accident_case_original`
+    ALTER TABLE `project_accident.full_accident_case`
     RENAME COLUMN Dead_Conso_Id TO acc_case_id,
     RENAME COLUMN DEAD_YEAR TO psn_dead_year,
     RENAME COLUMN Age TO psn_age,
@@ -158,7 +176,7 @@ with DAG(
         case_long,
         icd_code,
         case_vehicle
-    FROM `project_accident_raw.accident_case_original`
+    FROM `project_accident.full_accident_case`
     );
     """
 
@@ -175,7 +193,7 @@ with DAG(
             psn_tumbol, 
             psn_district,
             psn_province,
-        FROM `project_accident_raw.accident_case_original`
+        FROM `project_accident.full_accident_case`
     );
     """
 
@@ -203,4 +221,4 @@ with DAG(
         dag=dag,
     )
 
-    get_files_api >> upload_to_gcs >> [create_bq_raw_dataset, create_bq_dataset] >> load_to_bq >> table_prep >> [create_case_table, create_person_table] 
+    start >> get_files_api >> upload_to_gcs >> [create_bq_raw_dataset, create_bq_dataset] >> follow_create_dataset >> [load_to_bq, load_raw_to_bq] >> table_prep >> [create_case_table, create_person_table] >> end
