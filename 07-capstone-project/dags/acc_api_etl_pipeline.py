@@ -124,7 +124,7 @@ with DAG(
         task_id='load_to_bq',
         bucket='swu-ds525-8888',
         source_objects=['RoadAccident_{{ execution_date.strftime("%Y-%m-%d") }}*.csv'],  # Use wildcard pattern
-        destination_project_dataset_table='stalwart-summer-413911.project_accident.full_accident_case',
+        destination_project_dataset_table='stalwart-summer-413911.project_accident.accident_case_obt',
         source_format='CSV',
         create_disposition='CREATE_IF_NEEDED',
         write_disposition='WRITE_TRUNCATE',  # Options: WRITE_TRUNCATE, WRITE_APPEND, WRITE_EMPTY
@@ -135,14 +135,14 @@ with DAG(
     follow_create_dataset = EmptyOperator(task_id='follow_create_dataset')
 
     table_prep_sql = f"""
-    ALTER TABLE `project_accident.full_accident_case`
+    ALTER TABLE `project_accident.accident_case_obt`
     DROP COLUMN _id,
     DROP COLUMN Dead_Year___________________________________________,
     DROP COLUMN Date_Rec,
     DROP COLUMN Risk_Helmet,
     DROP COLUMN Risk_Safety_Belt;
 
-    ALTER TABLE `project_accident.full_accident_case`
+    ALTER TABLE `project_accident.accident_case_obt`
     RENAME COLUMN Dead_Conso_Id TO acc_case_id,
     RENAME COLUMN DEAD_YEAR TO psn_dead_year,
     RENAME COLUMN Age TO psn_age,
@@ -160,6 +160,16 @@ with DAG(
     RENAME COLUMN Acclong TO case_long,
     RENAME COLUMN Ncause TO icd_code,
     RENAME COLUMN Vehicle_Merge_Final TO case_vehicle;
+
+    CREATE OR REPLACE TABLE `project_accident.accident_case_obt_with_id` AS
+    SELECT *,
+       CAST(ROW_NUMBER() OVER() AS STRING) AS personal_id
+    FROM `project_accident.accident_case_obt`;
+
+    DROP TABLE `project_accident.accident_case_obt`;
+
+    ALTER TABLE `project_accident.accident_case_obt_with_id`
+    RENAME TO `accident_case_obt`;
     """
     create_case_sql = f"""
     CREATE TABLE `project_accident.case_info`
@@ -175,8 +185,9 @@ with DAG(
         case_lat,
         case_long,
         icd_code,
-        case_vehicle
-    FROM `project_accident.full_accident_case`
+        case_vehicle,
+        personal_id
+    FROM `project_accident.accident_case_obt`
     );
     """
 
@@ -185,7 +196,7 @@ with DAG(
     PARTITION BY RANGE_BUCKET(psn_dead_year, GENERATE_ARRAY(2000, 2050, 1))
     AS (
         SELECT 
-            acc_case_id,
+            personal_id,
             psn_dead_year, 
             psn_age, 
             psn_sex, 
@@ -193,7 +204,7 @@ with DAG(
             psn_tumbol, 
             psn_district,
             psn_province,
-        FROM `project_accident.full_accident_case`
+        FROM `project_accident.accident_case_obt`
     );
     """
 
